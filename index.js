@@ -1,47 +1,47 @@
 const Store = require('./libs/store.js');
 
 module.exports = (opts = {}) => {
-    const { key = "koa:sess", store = new Store(), cKey = 'session'} = opts;
-    let ctxKey = ''
-    if (typeof cKey !== 'string' || cKey.trim().length === 0 ) ctxKey = 'session'
-    ctxKey = cKey.trim()
+    const { key = "koa:sess", store = new Store(), ctxKey = 'session'} = opts;
+    let cKey = ''
+    if (typeof ctxKey !== 'string' || ctxKey.trim().length === 0 ) cKey = 'session'
+    cKey = ctxKey.trim()
 
     return async (ctx, next) => {
         let id = ctx.cookies.get(key, opts);
 
         if(!id) {
-            ctx[ctxKey] = {};
+            ctx[cKey] = {};
         } else {
-            ctx[ctxKey] = await store.get(id, ctx);
+            ctx[cKey] = await store.get(id, ctx);
             // check session must be a no-null object
-            if(typeof ctx[ctxKey] !== "object" || ctx[ctxKey] == null) {
-                ctx[ctxKey] = {};
+            if(typeof ctx[cKey] !== "object" || ctx[cKey] == null) {
+                ctx[cKey] = {};
             }
         }
 
-        const old = JSON.stringify(ctx[ctxKey]);
+        const old = JSON.stringify(ctx[cKey]);
 
         await next();
         
-        const sess = JSON.stringify(ctx[ctxKey]);
+        const sess = JSON.stringify(ctx[cKey]);
         
         // if not changed
         if(old == sess) return;
 
         // if is an empty object
         if(sess == '{}') {
-            ctx[ctxKey] = null;
+            ctx[cKey] = null;
         }
 
         // need clear old session
-        if(id && !ctx[ctxKey]) {
+        if(id && !ctx[cKey]) {
             await store.destroy(id, ctx);
             ctx.cookies.set(key, null);
             return;
         }
 
         // set/update session
-        const sid = await store.set(ctx[ctxKey], Object.assign({}, opts, {sid: id}), ctx);
+        const sid = await store.set(ctx[cKey], Object.assign({}, opts, {sid: id}), ctx);
         ctx.cookies.set(key, sid, opts);
     }
 }
