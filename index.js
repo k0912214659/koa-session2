@@ -1,9 +1,10 @@
 const Store = require('./libs/store.js');
 
 module.exports = (opts = {}) => {
-    const { key = "koa:sess", store = new Store(), ctxKey = 'session'} = opts;
-    if (typeof ctxKey !== 'string' || ctxKey.trim().length === 0 ) ctxKey = 'session'
-    ctxKey = ctxKey.trim()
+    const { key = "koa:sess", store = new Store(), cKey = 'session'} = opts;
+    let ctxKey = ''
+    if (typeof cKey !== 'string' || cKey.trim().length === 0 ) ctxKey = 'session'
+    ctxKey = cKey.trim()
 
     return async (ctx, next) => {
         let id = ctx.cookies.get(key, opts);
