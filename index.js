@@ -20,6 +20,7 @@ module.exports = (opts = {}) => {
         }
 
         const old = JSON.stringify(ctx[cKey]);
+        ctx.sid[cKey] = id
 
         await next();
         
