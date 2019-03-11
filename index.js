@@ -1,10 +1,12 @@
 const Store = require('./libs/store.js');
 
 module.exports = (opts = {}) => {
-    const { key = "koa:sess", store = new Store(), ctxKey = 'session'} = opts;
+    const { key = "koa:sess", store = new Store(), ctxKey = 'session', forceRenew = false} = opts;
     let cKey = ''
     if (typeof ctxKey !== 'string' || ctxKey.trim().length === 0 ) cKey = 'session'
     cKey = ctxKey.trim()
+
+    forceRenew = !!forceRenew
 
     return async (ctx, next) => {
         let id = ctx.cookies.get(key, opts);
@@ -28,7 +30,7 @@ module.exports = (opts = {}) => {
         const sess = JSON.stringify(ctx[cKey]);
         
         // if not changed
-        // if(old == sess) return;
+        if(old == sess && !forceRenew) return;
 
         // if is an empty object
         if(sess == '{}') {
