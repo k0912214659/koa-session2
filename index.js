@@ -28,7 +28,7 @@ module.exports = (opts = {}) => {
         const sess = JSON.stringify(ctx[cKey]);
         
         // if not changed
-        if(old == sess) return;
+        // if(old == sess) return;
 
         // if is an empty object
         if(sess == '{}') {
