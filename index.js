@@ -1,12 +1,13 @@
 const Store = require('./libs/store.js');
 
 module.exports = (opts = {}) => {
-    const { key = "koa:sess", store = new Store(), ctxKey = 'session', forceRenew = false} = opts;
+    const { key = "koa:sess", store = new Store(), ctxKey = 'session'} = opts;
     let cKey = ''
     if (typeof ctxKey !== 'string' || ctxKey.trim().length === 0 ) cKey = 'session'
     cKey = ctxKey.trim()
 
-    forceRenew = !!forceRenew
+    let forceRenew = !!opts.forceRenew
+    delete opts.forceRenew
 
     return async (ctx, next) => {
         let id = ctx.cookies.get(key, opts);
