@@ -44,6 +44,8 @@ module.exports = (opts = {}) => {
       ctx.cookies.set(key, null)
       return
     }
+    // no data and no id skip create session data
+    if (!id && !ctx[cKey]) return
 
     // set/update session
     const sid = await store.set(ctx[cKey], Object.assign({}, opts, { sid: id }), ctx)
