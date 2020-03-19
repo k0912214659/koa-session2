@@ -66,7 +66,7 @@ module.exports = (opts = {}) => {
     // set/update session
     let sid = await store.set(ctx[cKey], Object.assign({}, opts, { sid: id }), ctx)
     if (secret !== '') {
-      sid = signature.sign(sid, secret)
+      sid = encodeURIComponent(signature.sign(sid, secret))
     }
     ctx.cookies.set(key, sid, opts)
   }
