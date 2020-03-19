@@ -23,8 +23,8 @@ module.exports = (opts = {}) => {
         id = decodeURIComponent(id)
       } catch (err) {}
       if (id.substr(0, 2) === 's:') {
-        // sid is signed
-        sid = signature.unsign(sid.slice(2), secret)
+        // id is signed
+        id = signature.unsign(id.slice(2), secret)
       }
     }
 
