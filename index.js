@@ -1,4 +1,5 @@
 const Store = require('./libs/store.js')
+const signature = require('cookie-signature')
 
 module.exports = (opts = {}) => {
   const { key = 'koa:sess', store = new Store(), ctxKey = 'session' } = opts
@@ -9,8 +10,23 @@ module.exports = (opts = {}) => {
   let forceRenew = !!opts.forceRenew
   delete opts.forceRenew
 
+  let secret = ''
+  if ('secret' in opts && typeof opts.secret === 'string' && opts.secret.length > 0) secret = opts.secret
+  delete opts.secret
+
   return async (ctx, next) => {
     let id = ctx.cookies.get(key, opts)
+
+    // check sid is signed and unsign
+    if (secret !== '') {
+      try {
+        id = decodeURIComponent(id)
+      } catch (err) {}
+      if (id.substr(0, 2) === 's:') {
+        // sid is signed
+        sid = signature.unsign(sid.slice(2), secret)
+      }
+    }
 
     if (!id) {
       ctx[cKey] = {}
@@ -48,7 +64,10 @@ module.exports = (opts = {}) => {
     if (!id && !ctx[cKey]) return
 
     // set/update session
-    const sid = await store.set(ctx[cKey], Object.assign({}, opts, { sid: id }), ctx)
+    let sid = await store.set(ctx[cKey], Object.assign({}, opts, { sid: id }), ctx)
+    if (secret !== '') {
+      sid = signature.sign(sid, secret)
+    }
     ctx.cookies.set(key, sid, opts)
   }
 }
